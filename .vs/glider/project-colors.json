@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "47b6f0ff-cbd9-4e16-8750-a0194bdce25a": {
+      "ProjectGuid": "47b6f0ff-cbd9-4e16-8750-a0194bdce25a",
+      "DisplayName": "glider",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
