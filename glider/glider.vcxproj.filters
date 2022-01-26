@@ -21,12 +21,27 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_manager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
