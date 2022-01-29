@@ -1,7 +1,7 @@
-#include "pch.h" // windows crap
 #include "common.h"
 #include "game.h"
 #include "entity_manager.h"
+#include "bot.h"
 
 std::vector<Unit> Entity_Manager::unities;
 
@@ -50,10 +50,10 @@ void Entity_Manager::populate() {
 
 void Entity_Manager::log() {
 	for (int i = 0; i < unities.size(); i++) {
-		printf("Entidade %d\n", i+1);
-		printf("Nome: %s\n", unities[i].get_name());
-		printf("Guid: %llu\n", unities[i].get_guid());
-		printf("Vida: %d\n", unities[i].get_health());
-		printf("Ponteiro: 0x%x\n\n", unities[i].base_addr);
+		Bot::log("Entidade %d\n", i + 1);
+		Bot::log("Nome: %s\n", unities[i].get_name());
+		Bot::log("Guid: %llu\n", unities[i].get_guid());
+		Bot::log("Vida: %d\n", unities[i].get_health());
+		Bot::log("Ponteiro: 0x%x\n\n", unities[i].base_addr);
 	}
 }

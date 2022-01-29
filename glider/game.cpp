@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "game.h"
 
 _enumerate_visible_entities Game::enumerate_visible_entities =
