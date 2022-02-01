@@ -14,7 +14,7 @@ void Bot::init() {
 void Bot::draw_menu() {
     if (hide_menu) return;
 
-    ImGui::Begin("Lazy Bot");
+    ImGui::Begin("Glider");
     {
         if (ImGui::Button("Test")) test();
         ImGui::SameLine();
@@ -49,6 +49,8 @@ void Bot::log(const char *fmt, ...) {
 
 void Bot::test() {
     Entity_Manager em;
-    em.populate();
-    em.log();
+    em.populate_lists();
+    Local_Player* lp = &em.local_player;
+    auto enemy = lp->select_closest_enemy();
+    lp->click_to_move(enemy.get_position());
 }

@@ -1,6 +1,13 @@
 #pragma once
 #include "common.h"
 
+enum Click_Type {
+    CT_FACE_TARGET = 0x1,
+    CT_FACE = 0x2,
+    CT_MOVE = 0x4,
+    CT_NONE = 0xD,
+};
+
 typedef void(__fastcall* _enumerate_visible_entities)(void* callback, int filter);
 typedef u32(__stdcall* _get_entity_ptr)(u64 guid);
 typedef u64(__stdcall* _get_player_guid)();
