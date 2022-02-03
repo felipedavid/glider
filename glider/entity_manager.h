@@ -79,6 +79,7 @@ struct Player : public Unit {
 struct Local_Player : public Player {
 	static const u32 get_player_guid_fun_ptr = 0x468550;
 	static const u32 player_spells_base_addr = 0xB700F0;;
+	static const u32 movement_speed = 0xA34; // [player_base + 0xA34]
 
 	using Player::Player;
 	u64 get_guid();

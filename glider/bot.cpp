@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "windows.h"
 #include "bot.h"
 #include "entity_manager.h"
 #include "game.h"
@@ -52,6 +53,14 @@ void Bot::draw_menu() {
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Cheats")) {
+			if (ImGui::Checkbox("Teleport", &cheats.teleport_on)) cheats.teleport();
+			if (ImGui::Checkbox("No Fall Damage", &cheats.no_fall_damage_on)) cheats.no_fall_damage();
+			if (ImGui::Checkbox("Super Fly", &cheats.super_fly_on)) cheats.super_fly();
+			if (ImGui::SliderFloat("Jump Gravity", &cheats.new_jump_grav, -100.0f, 1.0f, "%.2f"))
+				write_to_memory((u8*)cheats.jump_gravity_ptr,  (u8*) & cheats.new_jump_grav, sizeof(float));
+			if (ImGui::SliderFloat("Wall Climb", &cheats.new_wall_climb, -10.0f, 10.0f, "%.2f"))
+				write_to_memory((u8*)cheats.wall_climb_ptr,  (u8*) & cheats.new_wall_climb, sizeof(float));
+			if (ImGui::SliderFloat("Player Speed", &cheats.new_speed, 0.0f, 300.0f, "%.2f")) cheats.speed_hack();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Lua")) {
