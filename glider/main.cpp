@@ -30,14 +30,19 @@ void InitImGui(LPDIRECT3DDEVICE9 pDevice)
 }
 
 bool init = false;
+bool bot_init = false;
 Bot bot;
 
 long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 {
-	if (!init)
-	{
+	if (!init) {
 		InitImGui(pDevice);
 		init = true;
+	}
+
+	if (!bot_init) {
+		bot.init();
+		bot_init = true;
 	}
 
 	// Toggle menu when user press the END key

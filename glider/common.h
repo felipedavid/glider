@@ -11,3 +11,5 @@ template <typename T>
 T read(u32 addr) {
 	return *(T*)addr;
 }
+
+void setup_theme();

@@ -117,7 +117,7 @@ void Entity_Manager::log() {
 		Bot::log("Nome: %s\n", unit.second.get_name());
 		Bot::log("Guid: %llu\n", unit.first);
 		Bot::log("Vida: %d\n", unit.second.get_health());
-		Bot::log("Ponteiro: 0x%x\n\n", unit.second.base_addr);
+		Bot::log("Ponteiro: 0x%x\n", unit.second.base_addr);
 	}
 
     for (auto player : player_list) {
