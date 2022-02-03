@@ -63,8 +63,8 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
-	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
+	//if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	//	return true;
 
 	// If the bot's menu is not hidden, pass all they input to the ImGui window buffer
 	if (!bot.hide_menu) {

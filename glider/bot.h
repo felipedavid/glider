@@ -2,9 +2,12 @@
 #include <stdarg.h>
 
 #include "imgui\imgui.h"
+#include "cheats.h"
 
 struct Bot {
     static bool running;
+
+    static Cheats cheats;
 
     // Gui stuff
     static bool hide_menu;

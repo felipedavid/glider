@@ -1,3 +1,4 @@
+#include "windows.h"
 #include "imgui/imgui.h"
 #include "common.h"
 
@@ -67,10 +68,15 @@ void setup_theme() {
 	style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Ruda-Bold.ttf", 12);
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Ruda-Bold.ttf", 10);
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Ruda-Bold.ttf", 14);
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Ruda-Bold.ttf", 18);
+	io.Fonts->AddFontFromFileTTF("C:\\fonts\\Ruda-Bold.ttf", 13);
+	io.Fonts->AddFontFromFileTTF("C:\\fonts\\Ruda-Bold.ttf", 11);
+	io.Fonts->AddFontFromFileTTF("C:\\fonts\\Ruda-Bold.ttf", 15);
+	io.Fonts->AddFontFromFileTTF("C:\\fonts\\Ruda-Bold.ttf", 18);
+}
 
-	//ImGui::PushFont(ImGui::GetFont("Ruda Bold"));
+void write_to_memory(u8* dst, u8* src, int size) {
+    DWORD oldprotect;
+    VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+    memcpy(dst, src, size);
+    VirtualProtect(dst, size, oldprotect, &oldprotect);
 }

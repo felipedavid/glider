@@ -2,13 +2,16 @@
 
 #include "bot.h"
 #include "entity_manager.h"
+#include "game.h"
 
 bool Bot::running;
 bool Bot::hide_menu;
 ImGuiTextBuffer Bot::log_buffer;
 bool Bot::scroll_to_bottom;
+Cheats Bot::cheats;
 
 void Bot::init() {
+	cheats.unlock_lua();
 	setup_theme();
 }
 
@@ -21,7 +24,12 @@ void Bot::draw_menu() {
     if (ImGui::BeginTabBar("#tabs", tab_bar_flags)) {
 		if (ImGui::BeginTabItem("Main")) {
 			{
-				if (ImGui::Button("Test")) test();
+				if (!running) {
+					if (ImGui::Button("Start")) test();
+				}
+				else {
+					if (ImGui::Button("Stop")) test();
+				}
 				ImGui::SameLine();
 				if (ImGui::Button("Clear logs")) log_buffer.clear();
 			}
@@ -40,11 +48,22 @@ void Bot::draw_menu() {
 
 			ImGui::EndTabItem();
 		} 
+		if (ImGui::BeginTabItem("Settings")) {
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Cheats")) {
+			ImGui::EndTabItem();
+		}
 		if (ImGui::BeginTabItem("Lua")) {
 			static char lua_code[2048];
-			ImGui::InputText("Lua code", lua_code, 2048);
 			if (ImGui::Button("Run")) {
+				Game::run_lua(lua_code, "a");
 			}
+			ImGui::SameLine();
+			if (ImGui::Button("Load file...")) {
+				// TODO
+			}
+			ImGui::InputTextMultiline("##source", lua_code, 2048, ImVec2(-1, -1));
 			ImGui::EndTabItem();
 		}
     }
