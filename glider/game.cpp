@@ -1,4 +1,7 @@
 #include "game.h"
+#include "bot.h"
+
+extern Bot bot;
 
 _enumerate_visible_entities Game::enumerate_visible_entities =
 (_enumerate_visible_entities)0x00468380;
@@ -25,4 +28,9 @@ bool Game::is_spell_ready(u32 spell_id) {
     u32 cooldown = 0;
     get_spell_cooldown(get_spell_cooldown_base, get_spell_cooldown_base, spell_id, 0, &cooldown, 0, 0);
     return cooldown == 0;
+}
+
+void __fastcall click_to_teleport(u32 x1, u32 x2, u32 x3, Vec3* pos, u32 x4, u32 x5) {
+    u8* player_base = (u8*)Game::get_entity_ptr(Game::get_player_guid());
+    write_to_memory((player_base + 0x9B8), (u8*)pos, sizeof(Vec3));
 }

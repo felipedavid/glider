@@ -52,3 +52,5 @@ struct Game {
     static u32 get_item_cache_entry_wrapper(u32 item_id);
     static bool is_spell_ready(u32 spell_id);
 };
+
+void __fastcall click_to_teleport(u32 x1, u32 x2, u32 x3, Vec3* pos, u32 x4, u32 x5);

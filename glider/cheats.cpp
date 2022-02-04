@@ -7,7 +7,16 @@ void Cheats::unlock_lua() {
 }
 
 void Cheats::teleport() {
-	if (teleport_on) return;
+	static u8* hook_location = (u8*)0x006102EA;
+	if (teleport_on) {
+		u8 jmp = 0xE9;
+		u32 addr = (u32)& click_to_teleport - ((u32)hook_location + 5);
+		write_to_memory((u8*)hook_location, &jmp, 1);
+		write_to_memory((u8*)hook_location+1, (u8*)&addr, 0x4);
+	} else {
+		static u8 patch[] = {0xE8, 0x41, 0x0e, 0x00, 0x00};
+		write_to_memory((u8*)hook_location, patch, 0x5);
+	}
 }
 
 void Cheats::no_fall_damage() {
