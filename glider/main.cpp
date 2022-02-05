@@ -13,29 +13,27 @@
 typedef long(__stdcall* EndScene)(LPDIRECT3DDEVICE9);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND window_handle, UINT msg, WPARAM w_param, LPARAM l_param);
 
-EndScene oEndScene = NULL;
-WNDPROC oWndProc;
+EndScene end_scene = NULL;
+WNDPROC wnd_proc;
 static HWND window = NULL;
 
-void InitImGui(LPDIRECT3DDEVICE9 pDevice)
-{
+void init_imgui(LPDIRECT3DDEVICE9 p_device) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 	ImGui_ImplWin32_Init(window);
-	ImGui_ImplDX9_Init(pDevice);
+	ImGui_ImplDX9_Init(p_device);
 }
 
 bool init = false;
 bool bot_init = false;
 Bot bot;
 
-long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
-{
+long __stdcall hook_end_scene(LPDIRECT3DDEVICE9 p_device) {
 	if (!init) {
-		InitImGui(pDevice);
+		init_imgui(p_device);
 		init = true;
 	}
 
@@ -57,67 +55,58 @@ long __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice)
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
-	return oEndScene(pDevice);
+	return end_scene(p_device);
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-	//	return true;
-
 	// If the bot's menu is not hidden, pass all they input to the ImGui window buffer
 	if (!bot.hide_menu) {
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 		return true;
 	}
 
-	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProc(wnd_proc, hWnd, uMsg, wParam, lParam);
 }
 
-BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
-{
-	DWORD wndProcId;
-	GetWindowThreadProcessId(handle, &wndProcId);
+BOOL CALLBACK enum_windows_callback(HWND handle, LPARAM lParam) {
+	DWORD wnd_proc_id;
+	GetWindowThreadProcessId(handle, &wnd_proc_id);
 
-	if (GetCurrentProcessId() != wndProcId)
-		return TRUE; // skip to next window
+	if (GetCurrentProcessId() != wnd_proc_id) return TRUE;
 
 	window = handle;
 	return FALSE; // window found abort search
 }
 
-HWND GetProcessWindow()
-{
+HWND get_proc_window() {
 	window = NULL;
-	EnumWindows(EnumWindowsCallback, NULL);
+	EnumWindows(enum_windows_callback, NULL);
 	return window;
 }
 
-DWORD WINAPI MainThread(LPVOID lpReserved)
+DWORD WINAPI main_thread(LPVOID lpReserved)
 {
 	bool attached = false;
-	do
-	{
-		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
-		{
-			kiero::bind(42, (void**)& oEndScene, hkEndScene);
-			do
-				window = GetProcessWindow();
+	do {
+		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success) {
+			kiero::bind(42, (void**)& end_scene, hook_end_scene);
+
+			do window = get_proc_window();
 			while (window == NULL);
-			oWndProc = (WNDPROC)SetWindowLongPtr(window, GWL_WNDPROC, (LONG_PTR)WndProc);
+
+			wnd_proc = (WNDPROC)SetWindowLongPtr(window, GWL_WNDPROC, (LONG_PTR)WndProc);
 			attached = true;
 		}
 	} while (!attached);
 	return TRUE;
 }
 
-BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
+BOOL WINAPI DllMain(HMODULE module_handle, DWORD reason, LPVOID reserved)
 {
-	switch (dwReason)
-	{
+	switch (reason) {
 	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(hMod);
-		CreateThread(nullptr, 0, MainThread, hMod, 0, nullptr);
+		DisableThreadLibraryCalls(module_handle);
+		CreateThread(nullptr, 0, main_thread, module_handle, 0, nullptr);
 		break;
 	case DLL_PROCESS_DETACH:
 		kiero::shutdown();
