@@ -24,6 +24,8 @@ struct Bot {
     static ImGuiTextBuffer log_buffer;
     static bool scroll_to_bottom;
     static int tick_rate;
+    std::vector<std::string> possible_targets;
+    std::vector<std::string> targets;
 
     static void init();
     static void main_loop();

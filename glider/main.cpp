@@ -59,6 +59,12 @@ long __stdcall hook_end_scene(LPDIRECT3DDEVICE9 p_device) {
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (uMsg == WM_USER) {
+        typedef void (*_procedure)();
+        _procedure procedure = (_procedure)wParam;
+        procedure();
+    }
+
 	// If the bot's menu is not hidden, pass all they input to the ImGui window buffer
 	if (!bot.hide_menu) {
 		ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);

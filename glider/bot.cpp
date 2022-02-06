@@ -24,7 +24,7 @@ void Bot::main_loop() {
     current_state = GRIND_STATE;
     while (running) {
         run_procedure_on_main_thread((void*)Bot::update);
-        Sleep(tick_rate);
+        Sleep(300);
     }
 }
 
@@ -42,7 +42,7 @@ void Bot::update() {
     }
     switch (current_state) {
         case GRIND_STATE: {
-            log("Looking for enemy...");
+            log("Looking for enemy...\n");
             enemy = lp->select_closest_enemy();
             lp->face_entity(enemy.get_guid());
             if (enemy.base_addr != 0) {
@@ -50,8 +50,9 @@ void Bot::update() {
             }
         } break;
         case MOVE_STATE: {
-            if (lp->distance_to(enemy.get_position()) > 5.0) {
-                log("Moving to enemy...");
+            log("Moving to enemy...\n");
+            if ((lp->get_mana() < 30 && lp->distance_to(enemy.get_position()) > 5)
+            || (lp->distance_to(enemy.get_position()) > 30.0)) {
                 lp->click_to_move(enemy.get_position());
             } else {
                 if (lp->get_position().x == prev_pos.x && lp->get_position().y == prev_pos.y) 
@@ -63,7 +64,10 @@ void Bot::update() {
             }
         } break;
         case COMBAT_STATE: {
-            lp->try_use_ability("Frost Armor", 60);
+            lp->face_entity(enemy.get_guid());
+            if (!lp->has_buff("Frost Armor")) {
+                lp->try_use_ability("Frost Armor", 60);
+            }
             lp->try_use_ability("Fireball", 30);
             lp->try_use_ability("Attack", 0);
 
@@ -72,14 +76,14 @@ void Bot::update() {
                     if (lp->distance_to(enemy.get_position()) > 5) {
                         lp->click_to_move(enemy.get_position());
                     } else {
-                        log("Looting...");
+                        log("Looting...\n");
                         Game::right_click_unit(enemy.base_addr, enemy.base_addr, 1);
                     }
                 } else {
                     current_state = GRIND_STATE;
                 }
             }
-            log("In combat...");
+            log("In combat...\n");
             if (enemy.get_health() > 0 && lp->distance_to(enemy.get_position()) < 5) {
                 current_state = MOVE_STATE;
             }
@@ -117,9 +121,19 @@ void Bot::draw_menu() {
 			ImGui::EndTabItem();
 		} 
 
-		if (ImGui::BeginTabItem("Settings")) {
-			ImGui::EndTabItem();
-		}
+		//if (ImGui::BeginTabItem("Settings")) {
+        //    static int item_current_idx = 0;
+        //    if(ImGui::ListBox("Enemies",)) {
+        //        for (int n = 0; n < em.unit_list.size(); n++) {
+        //            const bool is_selected = (item_current_idx == n);
+        //            if (ImGui::Selectable(em.unit_list[n], is_selected))
+        //                item_current_idx = n;
+
+        //            if (is_selected) ImGui::SetItemDefaultFocus();
+        //        }
+        //    }
+		//	ImGui::EndTabItem();
+		//}
 
 		if (ImGui::BeginTabItem("Cheats")) {
 			if (ImGui::Checkbox("Teleport", &cheats.teleport_on)) cheats.teleport();

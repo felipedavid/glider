@@ -39,6 +39,60 @@ Creature_Reaction Unit::get_reaction(u32 player_ptr) {
 	return (Creature_Reaction) Game::get_unit_reaction(base_addr, base_addr, player_ptr);
 }
 
+int Unit::get_mana() {
+    return read<u32> (get_descriptor_ptr() + mana_offset);
+}
+
+int Unit::get_level() {
+    return read<u32> (get_descriptor_ptr() + level_offset);
+}
+
+bool Unit::is_casting() {
+    return (bool) read<u32>(base_addr + current_spellcast_offset);
+}
+
+bool Unit::can_be_looted() {
+	return get_health() == 0 && read<u32>(get_descriptor_ptr() + dynamic_flags_offset) == CAN_BE_LOOTED;
+}
+
+std::vector<u32> Unit::get_buff_ids() {
+    std::vector<u32> buff_ids(10, 0);
+
+    u32 current_buff_offset = buffs_base_offset;
+    for (int i = 0; i < 10; i++) {
+        u32 buff_id = read<u32>(get_descriptor_ptr() + current_buff_offset);
+        if (buff_id == 0) break; 
+
+        buff_ids[i] = buff_id;
+        current_buff_offset += 4;
+    }
+    return buff_ids;
+}
+
+std::vector<u32> Unit::get_debuff_ids() {
+    std::vector<u32> debuff_ids(16, 0);
+
+    u32 current_debuff_offset = debuffs_base_offset;
+    for (int i = 0; i < 16; i++) {
+        u32 debuff_id = read<u32>(get_descriptor_ptr() + current_debuff_offset);
+        if (debuff_id == 0) break;
+
+        debuff_ids[i] = debuff_id;
+        current_debuff_offset += 4;
+    }
+    return debuff_ids;
+}
+
+bool Unit::has_buff(const char *buff_name) {
+    auto ids = get_buff_ids();
+    for (auto id : ids) {
+        if (id && !strcmp(buff_name, get_spell_name(id))) {
+            return true;
+        }
+    }
+    return false;
+}
+
 const char* Player::get_name() {
 	u32 name_ptr = read<u32>(name_base_offset);
 	for (;;) {
@@ -106,9 +160,20 @@ void Local_Player::face_entity(u64 guid) {
 }
 
 void Local_Player::try_use_ability(const char *name, int mana_required) {
-    if (is_spell_ready(name, 0) && !is_casting() && get_rage() >= mana_required) {
+    if (is_spell_ready(name, 0) && !is_casting() && get_mana() >= mana_required) {
         cast_spell(name);
     }
+}
+
+void Local_Player::cast_spell(const char *name) {
+    char lua_code[256];
+    snprintf(lua_code, sizeof(lua_code), "CastSpellByName('%s')", name);
+    Game::run_lua(lua_code, "Nothing");
+}
+
+bool Local_Player::is_spell_ready(const char* name, int spell_rank) {
+    if (spells.find(std::string(name)) == spells.end()) return false;
+    return Game::is_spell_ready(spells[name]);
 }
 
 int Entity_Manager::process_entity(void* thiss, int filter, u64 guid) {
@@ -116,9 +181,9 @@ int Entity_Manager::process_entity(void* thiss, int filter, u64 guid) {
 	Entity_Type type = read<Entity_Type>(base_addr + 0x14);
 
 	switch (type) {
-	case ET_UNIT:
+	case ET_UNIT: {
 		unit_list.insert({ guid, base_addr });
-		break;
+    } break;
 	case ET_PLAYER:
 		if (guid == local_player.get_guid()) {
 			local_player.base_addr = base_addr;

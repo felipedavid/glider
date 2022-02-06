@@ -41,6 +41,14 @@ enum Creature_Reaction {
 	CR_EXALED,
 };
 
+enum Dynamic_Flag {
+	UNTOUCHED,
+	CAN_BE_LOOTED,
+	IS_MARKED,
+	TAPPED,
+	TAPPED_BY_ME,
+};
+
 struct Entity {
 	// Offsets
 	static const u32 type_offset = 0x14;
@@ -54,10 +62,19 @@ struct Entity {
 };
 
 struct Unit : public Entity {
-	static const u32 descriptor_ptr_offset = 0x8;
-	static const u32 health_offset = 0x58;
-	static const u32 name_offset = 0xB30;
-	static const u32 position_offset = 0x9B8;
+    static const u32 descriptor_ptr_offset = 0x8;
+    static const u32 health_offset         = 0x58;
+    static const u32 max_health_offset     = 0x70;
+    static const u32 name_offset           = 0xB30; 
+    static const u32 position_offset       = 0x9B8;
+    static const u32 facing_offset         = 0x9C4;
+    static const u32 level_offset          = 0x88;
+    static const u32 rage_offset           = 0x60;
+    static const u32 mana_offset           = 0x5C;
+    static const u32 dynamic_flags_offset  = 0x23C;
+    static const u32 buffs_base_offset     = 0xBC; 
+    static const u32 debuffs_base_offset   = 0x13C; 
+    static const u32 current_spellcast_offset = 0xC8C;
 
 	using Entity::Entity;
 	u32 get_descriptor_ptr();
@@ -65,6 +82,13 @@ struct Unit : public Entity {
 	const char* get_name();
 	Vec3 get_position();
 	Creature_Reaction get_reaction(u32 player_ptr);
+    int get_mana();
+    int get_level();
+	bool is_casting();
+	bool can_be_looted();
+    bool has_buff(const char *buff_name);
+    std::vector<u32> get_buff_ids();
+    std::vector<u32> get_debuff_ids();
 };
 
 struct Player : public Unit {
@@ -92,6 +116,8 @@ struct Local_Player : public Player {
     void refresh_spells();
     void face_entity(u64 guid);
     void try_use_ability(const char *name, int mana_required);
+	void cast_spell(const char* name);
+    bool is_spell_ready(const char *name, int spell_rank);
 };
 
 struct Entity_Manager {
