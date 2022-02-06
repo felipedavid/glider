@@ -78,8 +78,9 @@ struct Player : public Unit {
 
 struct Local_Player : public Player {
 	static const u32 get_player_guid_fun_ptr = 0x468550;
-	static const u32 player_spells_base_addr = 0xB700F0;;
-	static const u32 movement_speed = 0xA34; // [player_base + 0xA34]
+	static const u32 player_spells_base_addr = 0xB700F0;
+
+    std::unordered_map<std::string, u32> spells;
 
 	using Player::Player;
 	u64 get_guid();
@@ -87,6 +88,10 @@ struct Local_Player : public Player {
 	Unit select_closest_enemy();
 	void set_target(u64 guid);
 	void click_to_move(Vec3 pos);
+    void click_to_stop();
+    void refresh_spells();
+    void face_entity(u64 guid);
+    void try_use_ability(const char *name, int mana_required);
 };
 
 struct Entity_Manager {

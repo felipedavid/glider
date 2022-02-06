@@ -80,3 +80,18 @@ void write_to_memory(u8* dst, u8* src, int size) {
     memcpy(dst, src, size);
     VirtualProtect(dst, size, oldprotect, &oldprotect);
 }
+
+const char* get_spell_name(u32 spell_id) {
+	static const u32 spells_base_addr = 0xC0D788;
+	static const u32 spell_name_offset = 0x1E0;
+
+	if (spell_id == 0) return "Empty";
+
+	u32 spell_ptr = read<u32>(read<u32>(spells_base_addr) + spell_id * 4);
+	return (const char*)read<u32>(spell_ptr + spell_name_offset);
+}
+
+void run_procedure_on_main_thread(void* procedure) {
+	HWND window_handle = FindWindow(NULL, "World of Warcraft");
+	SendMessage(window_handle, WM_USER, (WPARAM)procedure, 0);
+}

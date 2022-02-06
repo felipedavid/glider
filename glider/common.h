@@ -15,3 +15,5 @@ T read(u32 addr) {
 
 void setup_theme();
 void write_to_memory(u8* dst, u8* src, int size);
+const char* get_spell_name(u32 spell_id);
+void run_procedure_on_main_thread(void* procedure);

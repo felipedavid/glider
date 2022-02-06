@@ -86,6 +86,31 @@ void Local_Player::click_to_move(Vec3 pos) {
 	Game::click_to_move(base_addr, base_addr, CT_MOVE, &interact_guid_ptr, &pos, 2);
 }
 
+void Local_Player::click_to_stop() {
+    u64 interact_guid_ptr = 0;
+    Vec3 pos = get_position();
+    Game::click_to_move(base_addr, base_addr, CT_NONE, &interact_guid_ptr, &pos, 2);
+}
+
+void Local_Player::refresh_spells() {
+    spells.erase(spells.begin(), spells.end());
+    for (u32 *s_id = (u32*) player_spells_base_addr, i = 0; *s_id != 0 && i < 1024; s_id++) {
+        const char *name = get_spell_name(*s_id);
+        spells[std::string(name)] = *s_id;
+    }
+}
+
+void Local_Player::face_entity(u64 guid) {
+    auto p = get_position();
+    Game::click_to_move(base_addr, base_addr, CT_FACE_TARGET, &guid, &p, 2);
+}
+
+void Local_Player::try_use_ability(const char *name, int mana_required) {
+    if (is_spell_ready(name, 0) && !is_casting() && get_rage() >= mana_required) {
+        cast_spell(name);
+    }
+}
+
 int Entity_Manager::process_entity(void* thiss, int filter, u64 guid) {
 	u32 base_addr = Game::get_entity_ptr(guid);
 	Entity_Type type = read<Entity_Type>(base_addr + 0x14);
